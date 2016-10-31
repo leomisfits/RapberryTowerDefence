@@ -8,12 +8,16 @@ using namespace std;
 // Classe torre com as suas propriedades
 
 class tower {
-public:
+    tower(int tower_x, int tower_y){
+            this->tower_x = tower_x;
+            this->tower_y = tower_y;
+    }
+protected:
     int tower_x; // Posição x no mapa
     int tower_y; // Posição y no mapa
-    int fire_speed;
-    int range; // Alance do tiro
-}tower1; // Inicialmente, você só tem uma torre disponivel para atacar os inimigos
+    int fire_speed = 1;
+    int range = 2; // Alance do tiro
+}; // Inicialmente, você só tem uma torre disponivel para atacar os inimigos
 
 // Classe inimigo e suas propriedades
 
