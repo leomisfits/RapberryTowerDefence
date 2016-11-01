@@ -48,21 +48,53 @@ int towerSort(int num){
 
 // Classe torre com as suas propriedades
 
-class Basictower {
+class BasicTower {
 public:
-    tower(int tower_x, int tower_y){
-        tlocation.x = tower_x;
-        tlocation.y = tower_y;
+    tower(int towerid){
+      if(towerid == 1){
+        tlocation.x = 2;
+        tlocation.y = 2;
+        digitalWrite (towerSort(towerid), HIGH) ;
+      }
+      if(towerid == 2){
+        tlocation.x = 2;
+        tlocation.y = 4;
+        digitalWrite (towerSort(towerid), HIGH) ;
+      }
+      if(towerid == 3){
+        tlocation.x = 2;
+        tlocation.y = 6;
+        digitalWrite (towerSort(towerid), HIGH) ;
+      }
+      if(towerid == 4){
+        tlocation.x = 2;
+        tlocation.y = 8;
+        digitalWrite (towerSort(towerid), HIGH) ;
+      }
     }
-    void shoot_effect(int tower_){
-        digitalWrite (towerSort(tower_),  LOW) ; delay (70) ;
-        digitalWrite (towerSort(tower_), HIGH) ;
-}
+    void shoot_effect(){
+        digitalWrite (towerSort(towerid),  LOW) ; delay (70) ;
+        digitalWrite (towerSort(towerid), HIGH) ;
+    }
+    bool hitTarget(){
+      return (75 > rand() % 101);
+    }
+    void shoot(enemy en){
+      if(en.isAlive && en.distanceTo(tlocation) < range){
+        shoot_effect();
+        if(hitTarget){
+           en.decreaseHealth();
+         }
+      }
+          
+        
+    }
 protected:
     Point tlocation; //localizacao
+    int towerid;
     int fire_speed = 1;
     int range = 2; // Alance do tiro
-    float accuracy = 0.75;
+    int accuracy = 75; // 75% of accuracy
    
 }; // Inicialmente, você só tem uma torre disponivel para atacar os inimigos
 
@@ -70,24 +102,30 @@ protected:
 
 class enemy {
 public:
+    void move () {elocation.y = elocation.y + moving_speed;} // Move o inimigo em direção ao cristal
     enemy (int enemy_x, int enemy_y) {
         elocation.x = enemy_x;
         elocation.y = enemy_y;
     }
+    bool isAlive(){
+      if(health > 0)
+        return true
+      else
+        return false
+    }
+   void decreaseHealth(){ health--;}
+protected:
     Point elocation; //localizacao do inimigo
-    int moving_speed;
-    int health = 3; // Saude do inimigo
-    void move () {Elocation.y++;} // Move o inimigo em direção ao cristal
+    int moving_speed = 0.5;
+    int health = 4; // Saude do inimigo
 } enemy1, enemy2, enemy3; // Existem vários inimigos no jogo
 
 // Classe do crystal, que é alvo dos inimigos
 
 class Crystal {
 public:
-    int crystal_x; // Posição x do Crystal no mapa
-    int crystal_y; // Posição y do Crystal no mapa
-    int health; // Saúde do crystal (quando chegar a 0, o crystal é destruído e você perde o jogo)
-    Crystal() {health = 10;} // Saúde do crystal no inicio do jogo
+    Point clocation(0,10); //localizacao do cristal
+    int health = 10; // Saúde do crystal (quando chegar a 0, o crystal é destruído e você perde o jogo)
 
 } crystal; // Só existe um cristal no jogo. Se ele for destruído, você perde.
 
@@ -104,7 +142,7 @@ class point{
     int distanceTo(int x, int y){
         return static_cast<int>(sqrt(pow(this->x-x, 2) + pow(this->y-y, 2)));
     }
-    int DistanceTo(Point point){
+    int distanceTo(Point point){
             return DistanceTo(point.X, point.Y);
      }
 }
@@ -112,49 +150,13 @@ class point{
 
 class map {
 public:
-    int width; // Tamanho da largura do mapa
-    int height; // Tamanho da altura do mapa
+    int width = 5; // Tamanho da largura do mapa
+    int height = 10; // Tamanho da altura do mapa
     bool OnMap(Point point){
             return point.X >= 0 && point.X < width && 
                    point.Y >= 0 && point.Y < height;
     }
-    void draw(); // É dentro desta função que todo o desenho do jogo ocorre
 } map1;
-
-// A função abaixo desenha o estado do jogo a cada intervalo de tempo (menos de 1 segundo)
-void map::draw()
-{
-    system("clear");
-    for (int i = 0; i < width+2; i++)
-        cout << "#";
-        cout << endl;
-
-        for (int i = 0; i < height; i++)
-        {
-
-            for (int j = 0; j < height; j++)
-            {
-                if (j == 0)
-                    cout << "#";
-                    if (i==enemy1.enemy_x and (j==enemy1.enemy_y or j==enemy2.enemy_y or j==enemy3.enemy_y)
-                        and enemy1.enemy_y!=crystal.crystal_y) // Mostra o desenho dos inimigos em seu devido lugar
-                        cout << "*";
-                    else if (i==tower1.tower_x and j==tower1.tower_y) // Mostra o desenho da torre em seu devido lugar
-                        cout << "_";
-                    else if (i==crystal.crystal_x and j==crystal.crystal_y) // Mostra o desenho do cristal em seu devido lugar
-                        cout << "@";
-                    else
-                    cout << " ";
-
-                if (j == width-1)
-                    cout << "#";
-            }
-            cout << endl;
-        }
-        for (int i = 0; i < width+2; i++)
-            cout << "#";
-        cout << endl;
-}
 
 
 // Declara valores iniciais toda vez que um novo nivel é feito
@@ -173,26 +175,6 @@ void pinsetup(){
   pinMode (8, OUTPUT);
   pinMode (9, OUTPUT);
   pinMode (10, OUTPUT);
-}
-
-void setup () {
-    map1.height = 20; // Altura do mapa
-    map1.width = 20; // Largura do mapa
-    enemy1.enemy_x = 10;
-    enemy1.enemy_y = 0;
-    enemy1.make_stronger(); // Os inimigos vão ficando mais fortes a cada nivel
-    enemy2.enemy_x = 10;
-    enemy2.enemy_y = -3;
-    enemy2.make_stronger(); // Os inimigos vão ficando mais fortes a cada nivel
-    enemy3.enemy_x = 10;
-    enemy3.enemy_y = -6;
-    enemy3.make_stronger(); // Os inimigos vão ficando mais fortes a cada nivel
-    tower1.tower_x = 12;
-    tower1.tower_y = 3;
-    // O cristal possui uma posição fixa no mapa.
-    crystal.crystal_x = 10;
-    crystal.crystal_y = 19;
-
 }
 
 
