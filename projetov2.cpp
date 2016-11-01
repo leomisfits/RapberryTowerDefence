@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <conio.h>
-#include <windows.h> // unistd.h no LINUX
+#include <unistd.h>
 
 using namespace std;
 
@@ -57,7 +57,7 @@ public:
 // A função abaixo desenha o estado do jogo a cada intervalo de tempo (menos de 1 segundo)
 void map::draw()
 {
-    system("cls");
+    system("clear");
     for (int i = 0; i < width+2; i++)
         cout << "#";
         cout << endl;
@@ -126,7 +126,7 @@ int main ()
     }
     // INICIO DO JOGO
     map1.draw(); // Mostra o mapa
-    Sleep(100); // Faz uma micro-pausa
+    usleep(100000); // Faz uma micro-pausa
     enemy1.move(); // Move o inimigo 1. O mesmo para as linhas abaixo
     enemy2.move();
     enemy3.move();
