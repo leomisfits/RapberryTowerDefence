@@ -3,16 +3,61 @@
 #include <conio.h>
 #include <unistd.h>
 #include <cmath>
+#include <wiringPi.h>
+#include <iostream>
 
 using namespace std;
+
+int enemySort(int num){
+  if (num == 1)
+    return 8;
+  if (num == 2)
+    return 9;
+  if (num == 3)
+    return 7;
+  if (num == 4)
+    return 0;
+  if (num == 5)
+    return 1;
+  if (num == 6)
+    return 2;
+  if (num == 7)
+    return 3;
+  if (num == 8)
+    return 4;
+  if (num == 9)
+    return 5;
+  else
+    return 404;
+}
+
+int towerSort(int num){
+  if(num == 1)
+    return 14;
+  if (num == 2)
+    return 6;
+  if (num == 3)
+    return 13;
+  if (num == 4)
+    return 12;
+  else
+    return 404;
+}
+
+//cristal = 10
 
 // Classe torre com as suas propriedades
 
 class Basictower {
+public:
     tower(int tower_x, int tower_y){
-            tlocation.x = tower_x;
-            tlocation.y = tower_y;
+        tlocation.x = tower_x;
+        tlocation.y = tower_y;
     }
+    void shoot_effect(int tower_){
+        digitalWrite (towerSort(tower_),  LOW) ; delay (70) ;
+        digitalWrite (towerSort(tower_), HIGH) ;
+}
 protected:
     Point tlocation; //localizacao
     int fire_speed = 1;
@@ -113,6 +158,22 @@ void map::draw()
 
 
 // Declara valores iniciais toda vez que um novo nivel é feito
+void pinsetup(){
+  pinMode (14, OUTPUT);
+  pinMode (12, OUTPUT);
+  pinMode (13, OUTPUT);
+  pinMode (6, OUTPUT);
+  pinMode (5, OUTPUT);
+  pinMode (4, OUTPUT);
+  pinMode (3, OUTPUT);
+  pinMode (2, OUTPUT);
+  pinMode (1, OUTPUT);
+  pinMode (0, OUTPUT);
+  pinMode (7, OUTPUT);
+  pinMode (8, OUTPUT);
+  pinMode (9, OUTPUT);
+  pinMode (10, OUTPUT);
+}
 
 void setup () {
     map1.height = 20; // Altura do mapa
@@ -139,7 +200,7 @@ int main ()
 {
     int thereisgame = true; // Inicialmente, há jogo até que você perca o jogo.
     int counter(26); // Um auxiliar que será usado para saber quando um nivel acaba
-
+    pinsetup();
     while (thereisgame) // Enquanto houver jogo.
     {
     if (counter>25) { // Inicia um novo nivel
