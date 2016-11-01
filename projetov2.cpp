@@ -77,7 +77,7 @@ namespace towerGame{
             digitalWrite (towerSort(towerid), HIGH) ;
         }
         bool hitTarget(){
-          return (75 > rand() % 101);
+          return (75 > rand()%100 + 1);
         }
         void shoot(enemy en){
           if(en.isAlive && en.distanceTo(tlocation) < range){
@@ -100,10 +100,21 @@ namespace towerGame{
 
     class enemy {
     public:
-        void move () {elocation.y = elocation.y + moving_speed;} // Move o inimigo em direção ao cristal
+        void move () {
+            if(ableToMove){
+                if(elocation.y > 0 && elocation.y < 10)
+                    digitalWrite (enemySort(elocation.y), LOW);
+                elocation.y = elocation.y + 1;
+                if(elocation.y > 0 && elocation.y < 10)
+                    digitalWrite (enemySort(elocation.y), HIGH);
+            }
+        } // Move o inimigo em direção ao cristal
         enemy (int enemy_x, int enemy_y) {
             elocation.x = enemy_x;
             elocation.y = enemy_y;
+        }
+        bool ableToMove(){
+            return moving_speed > rand() % 50 + 1;
         }
         bool isAlive(){
           if(health > 0)
@@ -114,7 +125,7 @@ namespace towerGame{
        void decreaseHealth(){ health--;}
     protected:
         Point elocation; //localizacao do inimigo
-        int moving_speed = 0.5;
+        int moving_speed = 50; // 0.5 aprox casas por segundo
         int health = 4; // Saude do inimigo
     } enemy1, enemy2, enemy3; // Existem vários inimigos no jogo
 
@@ -122,7 +133,7 @@ namespace towerGame{
 
     class Crystal {
     public:
-        Point clocation(0,10); //localizacao do cristal
+        Point clocation(1,10); //localizacao do cristal
         int health = 10; // Saúde do crystal (quando chegar a 0, o crystal é destruído e você perde o jogo)
 
     } crystal; // Só existe um cristal no jogo. Se ele for destruído, você perde.
@@ -181,32 +192,40 @@ namespace towerGame{
         int thereisgame = true; // Inicialmente, há jogo até que você perca o jogo.
         int counter(26); // Um auxiliar que será usado para saber quando um nivel acaba
         pinsetup();
+        int numtower;
+        cout <<"choose a basic tower, 1 - 2 - 3 - 4 :";
+        cin >> numtower;
+        BasicTower tower1(numtower);
+        enemy enemy1(1,-3);
+        enemy enemy2(1,-1);
+        enemy enemy3(1, 0);
         while (thereisgame) // Enquanto houver jogo.
         {
-        if (counter>25) { // Inicia um novo nivel
-            counter = 0; // Zera o contador
-            setup(); // Seta os valores iniciais novamente, mas faz os inimigos ficarem mais poderosos
-        }
-        // INICIO DO JOGO
-        map1.draw(); // Mostra o mapa
-        usleep(100000); // Faz uma micro-pausa
-        enemy1.move(); // Move o inimigo 1. O mesmo para as linhas abaixo
-        enemy2.move();
-        enemy3.move();
-        counter++; // Aumenta o contador. Quando chegar a 26, o nivel acaba.
-        // Se um inimigo colidir com o crystal, o crystal perderá saúde
-        if ( enemy1.enemy_y == crystal.crystal_y or enemy2.enemy_y == crystal.crystal_y
-            or enemy3.enemy_y == crystal.crystal_y) // Se o inimigo atingir o cristal...
-        {
-            crystal.health = crystal.health - enemy1.health; // O cristal perde pontos de saúde equivalentes aos pontos
-            // de saúde do inimigo
-        }
-        if (crystal.health <= 0) // Detectar se o cristal foi destruído
-        {
-            thereisgame = false; // Caso o crystal tenha sido destruído, o jogo acaba.
-            cout << "GAME OVER!"; // Mostra na tela que o jogo acabou.
-        }
-        // FIM DO JOGO
-        }
+           if (counter>25) { // Inicia um novo nivel
+                counter = 0; // Zera o contador
+            }
+            // INICIO DO JOGO
+            tower1.shoot(enemy1);
+            tower1.shoot(enemy2);
+            tower1.shoot(enemy3);
+            usleep(100000); // Faz uma micro-pausa
+            enemy1.move(); // Move o inimigo 1. O mesmo para as linhas abaixo
+            enemy2.move();
+            enemy3.move();
+            counter++; // Aumenta o contador. Quando chegar a 26, o nivel acaba.
+            // Se um inimigo colidir com o crystal, o crystal perderá saúde
+            if ( enemy1.elocation.y == crystal.clocation.y or enemy2.elocation.y == crystal.clocation.y
+                or enemy3.elocation.y == crystal.clocation.y) // Se o inimigo atingir o cristal...
+            {
+                crystal.health = crystal.health - enemy1.health; // O cristal perde pontos de saúde equivalentes aos pontos
+                // de saúde do inimigo
+            }
+            if (crystal.health <= 0) // Detectar se o cristal foi destruído
+            {
+                thereisgame = false; // Caso o crystal tenha sido destruído, o jogo acaba.
+                cout << "GAME OVER!"; // Mostra na tela que o jogo acabou.
+            }
+            // FIM DO JOGO
+            }
     }
 }
