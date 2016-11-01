@@ -2,34 +2,37 @@
 #include <cstdlib>
 #include <conio.h>
 #include <unistd.h>
+#include <cmath>
 
 using namespace std;
 
 // Classe torre com as suas propriedades
 
-class tower {
+class Basictower {
     tower(int tower_x, int tower_y){
-            this->tower_x = tower_x;
-            this->tower_y = tower_y;
+            tlocation.x = tower_x;
+            tlocation.y = tower_y;
     }
 protected:
-    int tower_x; // Posição x no mapa
-    int tower_y; // Posição y no mapa
+    Point tlocation; //localizacao
     int fire_speed = 1;
     int range = 2; // Alance do tiro
+    float accuracy = 0.75;
+   
 }; // Inicialmente, você só tem uma torre disponivel para atacar os inimigos
 
 // Classe inimigo e suas propriedades
 
 class enemy {
 public:
-    enemy () {health = 0;} // Os inimigos começam com 0 de saude
-    int enemy_x; // Posição x do inimigo no mapa
-    int enemy_y; // Posição y do inimigo no mapa
+    enemy (int enemy_x, int enemy_y) {
+        elocation.x = enemy_x;
+        elocation.y = enemy_y;
+    }
+    Point elocation; //localizacao do inimigo
     int moving_speed;
-    int health; // Saude do inimigo
-    void make_stronger() {health++;} // Os inimigos vão ficando mais fortes a cada nivel
-    void move () {enemy_y++;} // Move o inimigo em direção ao cristal
+    int health = 3; // Saude do inimigo
+    void move () {Elocation.y++;} // Move o inimigo em direção ao cristal
 } enemy1, enemy2, enemy3; // Existem vários inimigos no jogo
 
 // Classe do crystal, que é alvo dos inimigos
@@ -45,12 +48,31 @@ public:
 
 // Uma classe mapa que vai herdar todas as classes iniciais
 
-class map : public tower, public enemy, public Crystal {
+class point{
+    public:
+        int x;
+        int y;
+    point(int x, int y){
+        this->x = x;
+        this->y = y;
+    }
+    int distanceTo(int x, int y){
+        return static_cast<int>(sqrt(pow(this->x-x, 2) + pow(this->y-y, 2)));
+    }
+    int DistanceTo(Point point){
+            return DistanceTo(point.X, point.Y);
+     }
+}
+
+
+class map {
 public:
     int width; // Tamanho da largura do mapa
     int height; // Tamanho da altura do mapa
-    int x;
-    int y;
+    bool OnMap(Point point){
+            return point.X >= 0 && point.X < width && 
+                   point.Y >= 0 && point.Y < height;
+    }
     void draw(); // É dentro desta função que todo o desenho do jogo ocorre
 } map1;
 
