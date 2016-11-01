@@ -23,7 +23,7 @@ int enemySort(int num){
   if (num == 9)
     return 5;
   else
-    cout <<"invalid";
+    return 404;
 }
 
 int towerSort(int num){
@@ -35,6 +35,8 @@ int towerSort(int num){
     return 13;
   if (num == 4)
     return 12;
+  else
+    return 404;
 }
 
 //cristal = 10
@@ -57,8 +59,8 @@ void setup(){
 }
 
 void shoot(int tower){
-  digitalWrite (towerSort(tower), HIGH) ; delay (50) ;
-  digitalWrite (towerSort(tower),  HIGH) ; delay (50) ;
+  digitalWrite (towerSort(tower),  LOW) ; delay (70) ;
+  digitalWrite (towerSort(tower), HIGH) ;
 }
 
 int main ()
